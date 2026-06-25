@@ -19,6 +19,7 @@ enum TokenType {
   slash,
   openParanthesis,
   closeParanthesis,
+  eof
 }
 
 class Token {
