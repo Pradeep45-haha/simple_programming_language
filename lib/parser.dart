@@ -2,6 +2,7 @@ import 'package:a_very_simple_lang/expression.dart';
 import 'package:a_very_simple_lang/token.dart';
 
 class Parser {
+  bool enableLogging = true;
   final List<Token> _tokens;
 
   int _idx = 0;
@@ -27,7 +28,8 @@ class Parser {
     if (_isAtEnd()) {
       return _tokens[_idx];
     }
-    return _tokens[_idx++];
+    _idx = _idx + 1;
+    return _tokens[_idx - 1];
   }
 
   bool _check({required TokenType tokenType}) {
@@ -39,11 +41,11 @@ class Parser {
   }
 
   Token _consume({required TokenType tokenType, required String message}) {
-    Token token = _advance();
     if (_check(tokenType: tokenType)) {
-      return token;
+      return _advance();
     }
-    throw ParserError(errorMessage: "Invalid Token Type", token: token);
+
+    throw ParserError(errorMessage: message, token: _peek());
   }
 
   bool _match({required List<TokenType> tokenTypeList}) {
@@ -56,14 +58,20 @@ class Parser {
     return false;
   }
 
-  Expression parse() {}
+  Expression parse() {
+    if (enableLogging == true) print("parse");
+    Expression expression = _parseExpression();
+    _consume(tokenType: TokenType.eof, message: "No eof token");
+    return expression;
+  }
 
-  Expression parseExpression() {
-    Expression workingExpression = parseTerm();
+  Expression _parseExpression() {
+    if (enableLogging == true) print("_parseExpression");
+    Expression workingExpression = _parseTerm();
 
     while (_match(tokenTypeList: [TokenType.plus, TokenType.minus])) {
       Token operator = _previous();
-      Expression parsedTerm = parseTerm();
+      Expression parsedTerm = _parseTerm();
 
       workingExpression = BinaryOperator(
         left: workingExpression,
@@ -74,23 +82,40 @@ class Parser {
     return workingExpression;
   }
 
-  Expression parseTerm() {
-    
+  Expression _parseTerm() {
+    if (enableLogging == true) print("_parseTerm");
+    Expression workingExpression = _parseFactor();
+
+    while (_match(tokenTypeList: [TokenType.star, TokenType.slash])) {
+      Token operator = _previous();
+      Expression parsedFactor = _parseFactor();
+
+      workingExpression = BinaryOperator(
+        left: workingExpression,
+        operator: operator,
+        right: parsedFactor,
+      );
+    }
+    return workingExpression;
   }
 
-  Expression parseFactor() {
+  Expression _parseFactor() {
+    if (enableLogging == true) print("_parseFactor");
     if (_match(tokenTypeList: [TokenType.number])) {
       return NumberLiteral(val: int.parse(_previous().val));
     }
 
     if (_match(tokenTypeList: [TokenType.openParanthesis])) {
-      Expression parsedExpression = parseExpression();
+      Expression parsedExpression = _parseExpression();
+  
       _consume(
         tokenType: TokenType.closeParanthesis,
         message: "Missing Close Paranthesis",
       );
       return parsedExpression;
     }
+
+    throw ParserError(errorMessage: "Invalid Token", token: _peek());
   }
 }
 
