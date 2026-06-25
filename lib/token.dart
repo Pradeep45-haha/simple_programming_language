@@ -1,14 +1,7 @@
 /*
-  E -> E + T
-  E -> E - T
-  E -> T
-
-  T -> T * F
-  T -> T / F
-  T -> F
-
-  F -> Integers 
-  F -> ( E )
+  E -> E ( '+' | '-' T )*
+  T -> F ( '*' | '/' F )*
+  F -> Integer | '(' E ')'
 */
 
 enum TokenType {
@@ -19,7 +12,7 @@ enum TokenType {
   slash,
   openParanthesis,
   closeParanthesis,
-  eof
+  eof,
 }
 
 class Token {
