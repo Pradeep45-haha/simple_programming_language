@@ -72,9 +72,9 @@ class Lexer {
     while (!_isAtEnd()) {
       _scanNextToken();
     }
-    if(_tokens.last.tokenType!= TokenType.end)
+    if(_tokens.last.tokenType!= TokenType.eof)
     {
-      _tokens.add(Token(tokenType: TokenType.end));
+      _tokens.add(Token(tokenType: TokenType.eof));
     }
     return _tokens;
   }
