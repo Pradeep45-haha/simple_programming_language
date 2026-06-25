@@ -6,6 +6,11 @@ abstract class Expression {}
 class NumberLiteral extends Expression {
   final int val;
   NumberLiteral({required this.val});
+
+  @override
+  String toString() {
+    return "NumberLiteral:$val";
+  }
 }
 
 class BinaryOperator extends Expression {
@@ -18,4 +23,9 @@ class BinaryOperator extends Expression {
     required this.right,
     required this.operator,
   });
+
+  @override
+  String toString() {
+    return "${left.toString()} ${operator.tokenType} ${right.toString()}";
+  }
 }
