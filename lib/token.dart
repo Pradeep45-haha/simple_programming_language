@@ -2,6 +2,10 @@
   E -> E ( '+' | '-' T )*
   T -> F ( '*' | '/' F )*
   F -> Integer | '(' E ')'
+  
+  E => Expression
+  T => Term
+  F => Factor
 */
 
 enum TokenType {
